@@ -66,11 +66,11 @@ Create the R2 media bucket once, then deploy:
 
 ```bash
 npx wrangler login
-npx wrangler r2 bucket create my-emdash-media   # must match bucket_name in wrangler.jsonc
+npx wrangler r2 bucket create emdashmedia   # must match bucket_name in wrangler.jsonc
 npm run deploy
 ```
 
-The first deploy creates the D1 database and KV session namespace automatically, but **not** the R2 bucket. Without it the deploy fails with `R2 bucket 'my-emdash-media' not found`. (In the Cloudflare dashboard: R2 Object Storage, Create bucket, same name. R2 may ask you to enable it on your account first.) If you deploy through Workers Builds (connected Git repo), create the bucket first and then retry the build. Then open `https://<your-worker>.workers.dev/_emdash/admin` and run the setup wizard there. See [Deploy to Cloudflare](https://docs.emdashcms.com/deployment/cloudflare/) for details, including custom domains.
+The first deploy creates the D1 database and KV session namespace automatically, but **not** the R2 bucket. Without it the deploy fails with `R2 bucket 'emdashmedia' not found`. (In the Cloudflare dashboard: R2 Object Storage, Create bucket, same name. R2 may ask you to enable it on your account first.) If you deploy through Workers Builds (connected Git repo), create the bucket first and then retry the build. Then open `https://<your-worker>.workers.dev/_emdash/admin` and run the setup wizard there. See [Deploy to Cloudflare](https://docs.emdashcms.com/deployment/cloudflare/) for details, including custom domains.
 
 Before going live:
 - Back up `EMDASH_ENCRYPTION_KEY` (create one with `npx emdash secrets generate`). Never commit `.env`.
