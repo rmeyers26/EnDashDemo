@@ -1,0 +1,121 @@
+---
+/**
+ * /how-it-works : explains what EmDash is doing behind this site.
+ * This page is plain Astro (not CMS content) because it describes the code itself.
+ */
+import Base from "../layouts/Base.astro";
+import "../styles/collections.css";
+
+// Which collection feeds which public page, and which files render it.
+const collections = [
+	{ name: "Photos", slug: "photos", pages: "/photos, /photos/:slug", file: "src/pages/photos/" },
+	{ name: "Press Releases", slug: "press", pages: "/press, /press/:slug", file: "src/pages/press/" },
+	{ name: "Videos", slug: "videos", pages: "/videos, /videos/:slug", file: "src/pages/videos/" },
+	{ name: "Journal", slug: "posts", pages: "/posts, /posts/:slug", file: "src/pages/posts/" },
+	{ name: "Pages", slug: "pages", pages: "/pages/:slug (About)", file: "src/pages/pages/" },
+];
+---
+
+<Base title="How it works" description="What EmDash CMS does behind the scenes of this site">
+	<article class="lf-detail">
+		<h1 class="lf-detail-title">How this site works</h1>
+		<p class="lf-detail-lede">
+			Everything you see here is stored in a database and edited in a dashboard. There are no content files to change and no rebuild to wait for.
+		</p>
+
+		<div class="lf-body">
+			<h2>The short version</h2>
+			<p>
+				This is an <a href="https://astro.build">Astro</a> website with the EmDash CMS built into it. Visitors see the public pages. Editors sign in at
+				<a href="/_emdash/admin">/_emdash/admin</a> and change content there. Both sides share one database and one media store.
+			</p>
+
+			<h2>Try it yourself</h2>
+			<ol>
+				<li>Open the <a href="/_emdash/admin">admin dashboard</a> and sign in.</li>
+				<li>Choose <strong>Photos</strong>, add a photo with a title and an image, and press <strong>Publish</strong>.</li>
+				<li>Reload <a href="/photos">/photos</a>. The new photo is there, and nothing was rebuilt or redeployed.</li>
+				<li>Open a press release, attach a PDF, publish, and a download button appears on its page.</li>
+				<li>Save a press release as a <strong>draft</strong> instead and it stays hidden from visitors until you publish it.</li>
+			</ol>
+
+			<h2>Where each kind of content lives</h2>
+		</div>
+
+		<div class="how-table-wrap">
+			<table class="how-table">
+				<thead>
+					<tr><th>Collection</th><th>Slug</th><th>Public pages</th><th>Code</th></tr>
+				</thead>
+				<tbody>
+					{
+						collections.map((c) => (
+							<tr>
+								<td>{c.name}</td>
+								<td><code>{c.slug}</code></td>
+								<td>{c.pages}</td>
+								<td><code>{c.file}</code></td>
+							</tr>
+						))
+					}
+				</tbody>
+			</table>
+		</div>
+
+		<div class="lf-body">
+			<h2>What happens when you load a page</h2>
+			<ol>
+				<li>Your browser asks Cloudflare for, say, <code>/photos</code>.</li>
+				<li>The page code runs on the server and asks EmDash for published photos with <code>getEmDashCollection("photos")</code>.</li>
+				<li>EmDash reads the rows from the <strong>D1</strong> database and returns them. Drafts are left out.</li>
+				<li>The page turns the rows into HTML. Uploaded files are served from <strong>R2</strong> storage.</li>
+			</ol>
+
+			<h2>Other ways to manage content</h2>
+			<p>
+				The admin dashboard is not the only door in. EmDash also has a command-line tool (<code>npx emdash content …</code>), a REST API under
+				<code>/_emdash/api</code>, and an MCP server at <code>/_emdash/api/mcp</code> so an AI assistant can draft and publish content for you.
+			</p>
+		</div>
+	</article>
+</Base>
+
+<style>
+	.how-table-wrap {
+		overflow-x: auto;
+		margin: var(--spacing-6) 0 var(--spacing-8);
+	}
+
+	.how-table {
+		width: 100%;
+		border-collapse: collapse;
+		font-size: var(--font-size-sm);
+	}
+
+	.how-table th,
+	.how-table td {
+		text-align: left;
+		padding: var(--spacing-3) var(--spacing-4);
+		border-bottom: 1px solid var(--color-border-subtle);
+	}
+
+	.how-table th {
+		font-size: var(--font-size-xs);
+		text-transform: uppercase;
+		letter-spacing: var(--tracking-wide);
+		color: var(--color-muted);
+	}
+
+	.how-table code,
+	.lf-body code {
+		font-family: var(--font-mono);
+		font-size: 0.9em;
+		background: var(--color-surface);
+		padding: 0.15em 0.35em;
+		border-radius: var(--radius);
+	}
+
+	.lf-body :global(a) {
+		color: var(--color-brand);
+	}
+</style>

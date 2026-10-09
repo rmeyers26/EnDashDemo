@@ -1,0 +1,85 @@
+---
+/**
+ * /photos/<slug> : one photo with its caption, camera details and story.
+ * `[slug]` in the filename is a dynamic route: /photos/first-light sets Astro.params.slug = "first-light".
+ */
+import { getEmDashEntry, getSeoMeta, decodeSlug, getSiteSettings } from "emdash";
+import { Image, PortableText } from "emdash/ui";
+import Base from "../../layouts/Base.astro";
+import { formatDate } from "../../utils/media-url";
+import { resolveBlogSiteIdentity } from "../../utils/site-identity";
+import "../../styles/collections.css";
+
+// decodeSlug safely handles odd characters in the URL; it returns undefined for bad input.
+const slug = decodeSlug(Astro.params.slug);
+if (!slug) return Astro.redirect("/404");
+
+const { entry: photo, cacheHint } = await getEmDashEntry("photos", slug);
+if (!photo) return Astro.redirect("/404");
+if (Astro.cache?.enabled) Astro.cache.set(cacheHint);
+
+const { siteTitle } = resolveBlogSiteIdentity(await getSiteSettings());
+
+// SEO tags (page title, social-share image, canonical link) generated from the entry.
+const seo = getSeoMeta(photo, {
+	siteTitle,
+	siteUrl: Astro.url.origin,
+	path: Astro.url.pathname.replace(/\/$/, ""),
+});
+
+// Terms (genre) are already attached to the entry by getEmDashEntry.
+const genres = photo.data.terms?.genre ?? [];
+const facts = [
+	{ label: "Genre", value: genres.map((g) => g.label).join(", ") },
+	{ label: "Location", value: photo.data.location },
+	{ label: "Camera", value: photo.data.camera },
+	{ label: "Lens", value: photo.data.lens },
+	{ label: "Date taken", value: formatDate(photo.data.taken_on) },
+].filter((f) => f.value); // hide rows the editor left empty
+---
+
+<Base
+	title={seo.title}
+	pageTitle={seo.ogTitle}
+	description={seo.description ?? photo.data.caption}
+	image={seo.ogImage}
+	canonical={seo.canonical}
+	robots={seo.robots}
+	content={{ collection: "photos", id: photo.data.id, slug }}
+>
+	<article class="lf-detail">
+		<a href="/photos" class="lf-back">← All photos</a>
+		<h1 class="lf-detail-title" {...photo.edit.title}>{photo.data.title}</h1>
+		{photo.data.caption && <p class="lf-detail-lede" {...photo.edit.caption}>{photo.data.caption}</p>}
+
+		{/* The image field is optional in the seed, so guard against a photo saved without one. */}
+		{
+			photo.data.image && (
+				<div class="lf-hero" {...photo.edit.image}>
+					<Image image={photo.data.image} priority />
+				</div>
+			)
+		}
+
+		{
+			facts.length > 0 && (
+				<dl class="lf-facts">
+					{facts.map((f) => (
+						<div>
+							<dt>{f.label}</dt>
+							<dd>{f.value}</dd>
+						</div>
+					))}
+				</dl>
+			)
+		}
+
+		{
+			photo.data.story && (
+				<div class="lf-body">
+					<PortableText value={photo.data.story} />
+				</div>
+			)
+		}
+	</article>
+</Base>

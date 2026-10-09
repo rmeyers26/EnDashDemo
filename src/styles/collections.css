@@ -1,0 +1,193 @@
+/*
+  collections.css -- layout shared by the Photos, Press and Videos pages.
+  It only uses the template's design tokens (src/styles/tokens.css), so
+  changing a token in theme.css restyles these pages too.
+  Class names are prefixed "lf-" (Lensfolio) to avoid clashing with template styles.
+*/
+
+/* ---------- List pages (/photos, /press, /videos) ---------- */
+.lf-page {
+	max-width: var(--wide-width);
+	margin: 0 auto;
+	padding: var(--spacing-8) var(--spacing-6) var(--spacing-16);
+}
+
+.lf-page-header {
+	margin-bottom: var(--spacing-10);
+}
+
+.lf-page-title {
+	font-size: var(--font-size-4xl);
+	font-weight: var(--font-weight-display);
+	letter-spacing: var(--tracking-tight);
+	margin-bottom: var(--spacing-2);
+}
+
+.lf-page-sub {
+	font-size: var(--font-size-lg);
+	color: var(--color-muted);
+}
+
+.lf-grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: var(--spacing-10) var(--spacing-8);
+}
+
+.lf-empty {
+	color: var(--color-muted);
+	font-size: var(--font-size-lg);
+}
+
+.lf-pagination {
+	display: flex;
+	gap: var(--spacing-6);
+	margin-top: var(--spacing-10);
+}
+
+.lf-pagination a {
+	color: var(--color-brand);
+	text-decoration: none;
+}
+
+/* ---------- Detail pages (/photos/x, /press/x, /videos/x) ---------- */
+.lf-detail {
+	max-width: var(--wide-width);
+	margin: 0 auto;
+	padding: var(--spacing-8) var(--spacing-6) var(--spacing-16);
+}
+
+.lf-back {
+	display: inline-block;
+	margin-bottom: var(--spacing-6);
+	font-size: var(--font-size-sm);
+	color: var(--color-muted);
+	text-decoration: none;
+}
+
+.lf-back:hover {
+	color: var(--color-text);
+}
+
+.lf-detail-title {
+	font-size: clamp(2rem, 5vw, var(--font-size-5xl));
+	font-weight: var(--font-weight-display);
+	line-height: var(--leading-tight);
+	letter-spacing: var(--tracking-tight);
+	margin-bottom: var(--spacing-3);
+}
+
+.lf-detail-lede {
+	font-size: var(--font-size-xl);
+	line-height: var(--leading-relaxed);
+	color: var(--color-text-secondary);
+	margin-bottom: var(--spacing-8);
+}
+
+.lf-hero {
+	border-radius: var(--radius-lg);
+	overflow: hidden;
+	background: var(--color-surface);
+	margin-bottom: var(--spacing-8);
+}
+
+.lf-hero img {
+	width: 100%;
+	height: auto;
+	max-height: 80vh;
+	object-fit: contain;
+}
+
+.lf-body {
+	max-width: var(--content-width);
+	font-size: var(--font-size-lg);
+	line-height: var(--leading-relaxed);
+}
+
+.lf-body p {
+	margin-bottom: 1.5em;
+}
+
+.lf-body h2 {
+	font-size: var(--font-size-2xl);
+	margin-top: 2em;
+	margin-bottom: 0.75em;
+}
+
+/* Key/value facts (camera, lens, location...) */
+.lf-facts {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+	gap: var(--spacing-4) var(--spacing-6);
+	margin: 0 0 var(--spacing-8);
+	padding: var(--spacing-4) 0;
+	border-top: 1px solid var(--color-border-subtle);
+	border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.lf-facts dt {
+	font-size: var(--font-size-xs);
+	font-weight: 500;
+	text-transform: uppercase;
+	letter-spacing: var(--tracking-wide);
+	color: var(--color-muted);
+}
+
+.lf-facts dd {
+	margin: 0;
+	color: var(--color-text-secondary);
+}
+
+.lf-btn {
+	display: inline-block;
+	padding: var(--spacing-3) var(--spacing-6);
+	background: var(--color-brand);
+	color: var(--color-on-brand);
+	text-decoration: none;
+	border-radius: var(--radius);
+	font-size: var(--font-size-sm);
+	font-weight: 500;
+	transition: background var(--transition-fast);
+}
+
+.lf-btn:hover {
+	background: var(--color-brand-hover);
+}
+
+.lf-note {
+	padding: var(--spacing-4) var(--spacing-5);
+	background: var(--color-bg-subtle);
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius);
+	color: var(--color-text-secondary);
+}
+
+.lf-video {
+	width: 100%;
+	max-height: 80vh;
+	border-radius: var(--radius-lg);
+	background: #000;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+	.lf-grid {
+		grid-template-columns: repeat(2, 1fr);
+		gap: var(--spacing-8) var(--spacing-6);
+	}
+}
+
+@media (max-width: 600px) {
+	.lf-page,
+	.lf-detail {
+		padding: var(--spacing-6) var(--spacing-4) var(--spacing-12);
+	}
+
+	.lf-page-title {
+		font-size: var(--font-size-3xl);
+	}
+
+	.lf-grid {
+		grid-template-columns: 1fr;
+	}
+}

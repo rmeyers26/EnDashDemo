@@ -16,6 +16,12 @@ export default defineConfig({
 		emdash({
 			database: d1({ binding: "DB", session: "auto" }),
 			storage: r2({ binding: "MEDIA" }),
+			// Largest single upload the Media Library accepts, in bytes (default 50 MB).
+			// Raised so short videos fit. Uploads pass through the Worker (R2 bindings
+			// cannot use signed URLs), and Cloudflare caps request bodies at about 100 MB
+			// on Free/Pro plans, so stay under that. For longer videos, use the
+			// Cloudflare Stream media provider instead (see README).
+			maxUploadSize: 90 * 1024 * 1024,
 		}),
 	],
 	fonts: [

@@ -1,0 +1,68 @@
+---
+/**
+ * /photos : a grid of every published photo, newest first.
+ *
+ * Data flow (the "behind the scenes" part):
+ *   admin dashboard -> database -> getEmDashCollection("photos") -> this page
+ * Pages are server-rendered, so a photo you publish in the admin appears on the next reload.
+ */
+import { getEmDashCollection, getTermsForEntries } from "emdash";
+import Base from "../../layouts/Base.astro";
+import MediaCard from "../../components/MediaCard.astro";
+import "../../styles/collections.css";
+
+// Pagination: the CMS returns a `nextCursor` token when there are more entries.
+const cursor = Astro.url.searchParams.get("cursor") || undefined;
+const { entries: photos, cacheHint, nextCursor } = await getEmDashCollection("photos", {
+	orderBy: { published_at: "desc" },
+	limit: 24,
+	cursor,
+});
+if (Astro.cache?.enabled) Astro.cache.set(cacheHint);
+
+// One batched query for every photo's genre (instead of one query per photo).
+const genresByPhoto = await getTermsForEntries(
+	"photos",
+	photos.map((p) => p.data.id),
+	"genre",
+);
+---
+
+<Base title="Photos" description="Browse all photos">
+	<div class="lf-page">
+		<header class="lf-page-header">
+			<h1 class="lf-page-title">Photos</h1>
+			<p class="lf-page-sub">
+				{photos.length}
+				{photos.length === 1 ? "photo" : "photos"}
+			</p>
+		</header>
+
+		{
+			photos.length === 0 ? (
+				<p class="lf-empty">
+					No photos yet. <a href="/_emdash/admin/content/photos/new">Add one in the admin.</a>
+				</p>
+			) : (
+				<div class="lf-grid">
+					{photos.map((photo) => (
+						<MediaCard
+							title={photo.data.title}
+							href={`/photos/${photo.id}`}
+							image={photo.data.image}
+							label={genresByPhoto.get(photo.data.id)?.[0]?.label}
+							blurb={photo.data.caption}
+							editImage={photo.edit.image}
+							editTitle={photo.edit.title}
+						/>
+					))}
+				</div>
+			)
+		}
+
+		<nav class="lf-pagination" aria-label="Pagination">
+			{cursor && <a href="/photos">First page</a>}
+			{nextCursor && <a href={`/photos?cursor=${encodeURIComponent(nextCursor)}`}>Next page</a>}
+		</nav>
+	</div>
+</Base>

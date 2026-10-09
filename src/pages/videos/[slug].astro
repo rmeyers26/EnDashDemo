@@ -1,0 +1,57 @@
+---
+/**
+ * /videos/<slug> : plays the uploaded video with the browser's built-in <video> player.
+ * If no file has been uploaded yet (like the sample entry), we show a friendly hint instead.
+ */
+import { getEmDashEntry, getSeoMeta, decodeSlug, getSiteSettings } from "emdash";
+import Base from "../../layouts/Base.astro";
+import { getFileUrl } from "../../utils/media-url";
+import { resolveBlogSiteIdentity } from "../../utils/site-identity";
+import "../../styles/collections.css";
+
+const slug = decodeSlug(Astro.params.slug);
+if (!slug) return Astro.redirect("/404");
+
+const { entry: video, cacheHint } = await getEmDashEntry("videos", slug);
+if (!video) return Astro.redirect("/404");
+if (Astro.cache?.enabled) Astro.cache.set(cacheHint);
+
+const { siteTitle } = resolveBlogSiteIdentity(await getSiteSettings());
+const seo = getSeoMeta(video, {
+	siteTitle,
+	siteUrl: Astro.url.origin,
+	path: Astro.url.pathname.replace(/\/$/, ""),
+});
+
+const videoUrl = getFileUrl(video.data.video, Astro.locals.emdash?.getPublicMediaUrl);
+
+// The poster is shown before playback starts. It is an image field, so it already has a `src`.
+const posterUrl = typeof video.data.poster?.src === "string" ? video.data.poster.src : undefined;
+---
+
+<Base
+	title={seo.title}
+	pageTitle={seo.ogTitle}
+	description={seo.description ?? video.data.description}
+	image={seo.ogImage}
+	canonical={seo.canonical}
+	robots={seo.robots}
+	content={{ collection: "videos", id: video.data.id, slug }}
+>
+	<article class="lf-detail">
+		<a href="/videos" class="lf-back">← All videos</a>
+		<h1 class="lf-detail-title" {...video.edit.title}>{video.data.title}</h1>
+		{video.data.description && <p class="lf-detail-lede" {...video.edit.description}>{video.data.description}</p>}
+
+		{
+			videoUrl ? (
+				// preload="metadata" loads only the video's length/size up front, not the whole file.
+				<video class="lf-video" src={videoUrl} poster={posterUrl} controls preload="metadata" playsinline />
+			) : (
+				<p class="lf-note">
+					No video file is attached yet. In the admin, open this entry and upload an MP4 or WebM.
+				</p>
+			)
+		}
+	</article>
+</Base>
