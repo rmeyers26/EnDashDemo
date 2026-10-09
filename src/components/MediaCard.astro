@@ -1,0 +1,128 @@
+---
+/**
+ * MediaCard: one clickable card (image + title + small label + optional blurb).
+ * Used for photos, press releases and videos so all three look consistent.
+ */
+import type { MediaValue } from "emdash";
+import { Image } from "emdash/ui";
+
+interface Props {
+	title: string;
+	href: string;
+	image?: MediaValue | string;
+	/** Small line above the title, e.g. a genre or date. */
+	label?: string | null;
+	/** Optional short description under the title. */
+	blurb?: string | null;
+	/** Shows a play badge on the image (for videos). */
+	isVideo?: boolean;
+	/**
+	 * EmDash "visual editing" annotations (entry.edit.<field>). Spreading them on an
+	 * element lets a logged-in editor click-to-edit; they render nothing for visitors.
+	 */
+	editImage?: Record<string, unknown>;
+	editTitle?: Record<string, unknown>;
+	/** Image shape: "landscape" (16:10) or "square". */
+	shape?: "landscape" | "square";
+}
+
+const { title, href, image, label, blurb, isVideo, editImage, editTitle, shape = "landscape" } = Astro.props;
+---
+
+<article class="lf-card">
+	<a href={href} class="lf-card-link">
+		<div class:list={["lf-card-image", shape]} {...editImage}>
+			{image ? <Image image={image} /> : <div class="lf-card-empty">No image yet</div>}
+			{isVideo && <span class="lf-play" aria-hidden="true">▶</span>}
+		</div>
+		{label && <p class="lf-card-label">{label}</p>}
+		<h2 class="lf-card-title" {...editTitle}>{title}</h2>
+		{blurb && <p class="lf-card-blurb">{blurb}</p>}
+	</a>
+</article>
+
+<style>
+	.lf-card-link {
+		display: block;
+		text-decoration: none;
+		color: inherit;
+	}
+
+	.lf-card-image {
+		position: relative;
+		overflow: hidden;
+		border-radius: var(--radius-lg);
+		background: var(--color-surface);
+		margin-bottom: var(--spacing-3);
+		aspect-ratio: 16 / 10;
+	}
+
+	.lf-card-image.square {
+		aspect-ratio: 1 / 1;
+	}
+
+	.lf-card-image :global(img) {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		transition: transform 0.3s ease;
+	}
+
+	.lf-card-link:hover .lf-card-image :global(img) {
+		transform: scale(1.03);
+	}
+
+	.lf-card-empty {
+		display: grid;
+		place-items: center;
+		height: 100%;
+		color: var(--color-muted);
+		font-size: var(--font-size-sm);
+	}
+
+	/* Round play badge centred on video posters */
+	.lf-play {
+		position: absolute;
+		inset: 50% auto auto 50%;
+		transform: translate(-50%, -50%);
+		display: grid;
+		place-items: center;
+		width: 3.25rem;
+		height: 3.25rem;
+		border-radius: 50%;
+		background: rgb(0 0 0 / 0.6);
+		color: #fff;
+		font-size: var(--font-size-lg);
+		padding-left: 3px; /* optically centre the triangle */
+	}
+
+	.lf-card-label {
+		font-size: var(--font-size-xs);
+		text-transform: uppercase;
+		letter-spacing: var(--tracking-wide);
+		color: var(--color-muted);
+		margin-bottom: var(--spacing-1);
+	}
+
+	.lf-card-title {
+		font-size: var(--font-size-xl);
+		font-weight: var(--font-weight-heading);
+		line-height: var(--leading-snug);
+		letter-spacing: var(--tracking-snug);
+		transition: color var(--transition-fast);
+	}
+
+	.lf-card-link:hover .lf-card-title {
+		color: var(--color-brand);
+	}
+
+	.lf-card-blurb {
+		margin-top: var(--spacing-2);
+		color: var(--color-text-secondary);
+		line-height: var(--leading-relaxed);
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
+</style>

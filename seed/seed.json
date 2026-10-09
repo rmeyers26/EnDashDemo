@@ -35,7 +35,6 @@
 					"slug": "image",
 					"label": "Photo",
 					"type": "image",
-					"required": true,
 					"validation": {
 						"allowedMimeTypes": [
 							"image/jpeg",

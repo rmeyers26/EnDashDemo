@@ -1,0 +1,54 @@
+---
+/** /videos : a grid of video posters; each links to a page with a player. */
+import { getEmDashCollection } from "emdash";
+import Base from "../../layouts/Base.astro";
+import MediaCard from "../../components/MediaCard.astro";
+import "../../styles/collections.css";
+
+const cursor = Astro.url.searchParams.get("cursor") || undefined;
+const { entries: videos, cacheHint, nextCursor } = await getEmDashCollection("videos", {
+	orderBy: { published_at: "desc" },
+	limit: 24,
+	cursor,
+});
+if (Astro.cache?.enabled) Astro.cache.set(cacheHint);
+---
+
+<Base title="Videos" description="Watch videos">
+	<div class="lf-page">
+		<header class="lf-page-header">
+			<h1 class="lf-page-title">Videos</h1>
+			<p class="lf-page-sub">
+				{videos.length}
+				{videos.length === 1 ? "video" : "videos"}
+			</p>
+		</header>
+
+		{
+			videos.length === 0 ? (
+				<p class="lf-empty">
+					No videos yet. <a href="/_emdash/admin/content/videos/new">Upload one in the admin.</a>
+				</p>
+			) : (
+				<div class="lf-grid">
+					{videos.map((video) => (
+						<MediaCard
+							title={video.data.title}
+							href={`/videos/${video.id}`}
+							image={video.data.poster}
+							blurb={video.data.description}
+							isVideo
+							editImage={video.edit.poster}
+							editTitle={video.edit.title}
+						/>
+					))}
+				</div>
+			)
+		}
+
+		<nav class="lf-pagination" aria-label="Pagination">
+			{cursor && <a href="/videos">First page</a>}
+			{nextCursor && <a href={`/videos?cursor=${encodeURIComponent(nextCursor)}`}>Next page</a>}
+		</nav>
+	</div>
+</Base>

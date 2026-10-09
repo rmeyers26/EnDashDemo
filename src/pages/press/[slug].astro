@@ -1,0 +1,74 @@
+---
+/**
+ * /press/<slug> : a single press release with an optional PDF press kit to download.
+ */
+import { getEmDashEntry, getSeoMeta, decodeSlug, getSiteSettings } from "emdash";
+import { Image, PortableText } from "emdash/ui";
+import Base from "../../layouts/Base.astro";
+import { formatDate, getFileUrl } from "../../utils/media-url";
+import { resolveBlogSiteIdentity } from "../../utils/site-identity";
+import "../../styles/collections.css";
+
+const slug = decodeSlug(Astro.params.slug);
+if (!slug) return Astro.redirect("/404");
+
+const { entry: release, cacheHint } = await getEmDashEntry("press", slug);
+if (!release) return Astro.redirect("/404");
+if (Astro.cache?.enabled) Astro.cache.set(cacheHint);
+
+const { siteTitle } = resolveBlogSiteIdentity(await getSiteSettings());
+const seo = getSeoMeta(release, {
+	siteTitle,
+	siteUrl: Astro.url.origin,
+	path: Astro.url.pathname.replace(/\/$/, ""),
+});
+
+// A `file` field has no ready-made URL; the helper builds one from the storage key.
+const pdfUrl = getFileUrl(release.data.attachment, Astro.locals.emdash?.getPublicMediaUrl);
+const published = formatDate(release.data.publishedAt);
+---
+
+<Base
+	title={seo.title}
+	pageTitle={seo.ogTitle}
+	description={seo.description ?? release.data.summary}
+	image={seo.ogImage}
+	canonical={seo.canonical}
+	robots={seo.robots}
+	type="article"
+	publishedTime={release.data.publishedAt?.toISOString() ?? null}
+	modifiedTime={release.data.updatedAt.toISOString()}
+	content={{ collection: "press", id: release.data.id, slug }}
+>
+	<article class="lf-detail">
+		<a href="/press" class="lf-back">← All press releases</a>
+		<p class="lf-page-sub">
+			FOR IMMEDIATE RELEASE{published ? ` · ${published}` : ""}
+		</p>
+		<h1 class="lf-detail-title" {...release.edit.title}>{release.data.title}</h1>
+		{release.data.summary && <p class="lf-detail-lede" {...release.edit.summary}>{release.data.summary}</p>}
+
+		{
+			release.data.headline_image && (
+				<div class="lf-hero" {...release.edit.headline_image}>
+					<Image image={release.data.headline_image} priority />
+				</div>
+			)
+		}
+
+		<div class="lf-body">
+			{release.data.dateline && <p><strong>{release.data.dateline}</strong></p>}
+			<PortableText value={release.data.content} />
+		</div>
+
+		{
+			pdfUrl && (
+				<p>
+					<a class="lf-btn" href={pdfUrl} download>
+						Download press kit (PDF)
+					</a>
+				</p>
+			)
+		}
+	</article>
+</Base>
