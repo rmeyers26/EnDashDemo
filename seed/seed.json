@@ -381,6 +381,11 @@
 					"type": "custom",
 					"label": "About",
 					"url": "/pages/about"
+				},
+				{
+					"type": "custom",
+					"label": "How it works",
+					"url": "/how-it-works"
 				}
 			]
 		}
