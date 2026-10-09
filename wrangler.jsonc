@@ -10,6 +10,15 @@
 			"database_name": "my-emdash-site",
 		},
 	],
+	// Astro session storage. Pinned to the namespace created by the first deploy
+	// ("endashdemo-session"); without an id, Wrangler tries to create it again and fails
+	// with "a namespace with this account ID and title already exists".
+	"kv_namespaces": [
+		{
+			"binding": "SESSION",
+			"id": "6faa30d4445446d887a6df09512795ed",
+		},
+	],
 	"r2_buckets": [
 		{
 			"binding": "MEDIA",
