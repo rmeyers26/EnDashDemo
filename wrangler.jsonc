@@ -1,6 +1,6 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "my-emdash-site",
+	"name": "endashdemo",
 	"main": "./src/worker.ts",
 	"compatibility_date": "2026-02-24",
 	"compatibility_flags": ["nodejs_compat"],
@@ -13,7 +13,7 @@
 	"r2_buckets": [
 		{
 			"binding": "MEDIA",
-			"bucket_name": "my-emdash-media",
+			"bucket_name": "emdashmedia",
 		},
 	],
 	// Sandboxed plugins require Worker Loader, available on Workers paid plans. Uncomment to enable:
