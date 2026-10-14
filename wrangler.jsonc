@@ -27,8 +27,11 @@
 	],
 	// Sandboxed plugins require Worker Loader, available on Workers paid plans. Uncomment to enable:
 	// "worker_loaders": [{ "binding": "LOADER" }],
-	// General maintenance cron trigger
+	// General maintenance cron trigger, once an hour (minute 0). The template default is every
+	// minute, which wakes the Worker 1,440 times a day and exhausted the free plan's CPU limit.
+	// Keep this identical to `generalCron` in src/worker.ts. Scheduled press releases can go
+	// live up to an hour after their scheduled time.
 	"triggers": {
-		"crons": ["* * * * *"],
+		"crons": ["0 * * * *"],
 	},
 }
