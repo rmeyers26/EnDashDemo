@@ -83,6 +83,18 @@ Before going live:
 - The upload limit is set to 90 MB in `astro.config.mjs` (`maxUploadSize`). EmDash's default is 50 MB.
 - Uploads go through the Worker, so Cloudflare's request-size cap applies (about 100 MB on Free and Pro plans). For longer videos, add the Cloudflare Stream media provider (`cloudflareStream()` from `@emdash-cms/cloudflare`).
 
+## Email (optional)
+
+Email is only needed for magic-link sign-in, inviting users and account recovery. Passkey sign-in works without it.
+
+The site is already wired to send through Cloudflare Email Sending as `cms@mail.rmeyersconsulting.com` (see `astro.config.mjs` and the `send_email` binding in `wrangler.jsonc`). Sending fails until the sender domain is set up once in Cloudflare:
+
+1. In the Cloudflare dashboard, open **Email Service** (Email Sending) and onboard the sender domain `mail.rmeyersconsulting.com`. Cloudflare shows DNS records (SPF, DKIM) to add. Follow its steps: https://developers.cloudflare.com/email-routing/email-workers/send-email-workers/
+2. Wait for Cloudflare to show the domain as verified.
+3. In the admin, open **Settings → Email**, choose the Cloudflare provider if asked, and press **Send test email**. Errors are shown there.
+
+To use a different sender address, change `from` in `astro.config.mjs` and redeploy. The address must belong to a domain you have onboarded.
+
 ## Common mistakes
 
 - **Changed `seed.json` but nothing happened.** The seed only runs on an empty database. Delete `.wrangler/` locally, or change the model in the admin under **Content Types**.

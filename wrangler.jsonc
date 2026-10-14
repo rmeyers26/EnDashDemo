@@ -25,6 +25,8 @@
 			"bucket_name": "emdashmedia",
 		},
 	],
+	// Outbound email (used by the cloudflareEmail plugin in astro.config.mjs).
+	"send_email": [{ "name": "EMAIL" }],
 	// Sandboxed plugins require Worker Loader, available on Workers paid plans. Uncomment to enable:
 	// "worker_loaders": [{ "binding": "LOADER" }],
 	// General maintenance cron trigger
