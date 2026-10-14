@@ -1,6 +1,7 @@
 import cloudflare from "@astrojs/cloudflare";
 import react from "@astrojs/react";
 import { d1, r2 } from "@emdash-cms/cloudflare";
+import { cloudflareEmail } from "@emdash-cms/cloudflare/plugins";
 import { defineConfig, fontProviders } from "astro/config";
 import emdash from "emdash/astro";
 
@@ -22,6 +23,15 @@ export default defineConfig({
 			// on Free/Pro plans, so stay under that. For longer videos, use the
 			// Cloudflare Stream media provider instead (see README).
 			maxUploadSize: 90 * 1024 * 1024,
+			// Email for magic-link sign-in, invites and account recovery. It sends through
+			// the "EMAIL" send_email binding in wrangler.jsonc. The sender domain must be
+			// onboarded for Cloudflare Email Sending first (see README); until it is,
+			// sending fails but everything else (including passkey sign-in) still works.
+			plugins: [
+				cloudflareEmail({
+					from: { email: "cms@mail.rmeyersconsulting.com", name: "Lensfolio" },
+				}),
+			],
 		}),
 	],
 	fonts: [
